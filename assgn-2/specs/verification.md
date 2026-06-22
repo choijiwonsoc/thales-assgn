@@ -14,12 +14,14 @@ The matching engine logic checks successfully against standard NIST deterministi
 Run your unit tests using `npm test` and paste the terminal execution receipt right here:
 
 ```text
-✓ src/crypto.test.js (3 tests) 13ms
-   ✓ Vitest for SHA Hashing > SHA-256 of "abc" matches standard vector 2ms
-   ✓ Vitest for SHA Hashing > hashes empty string vector correctly 0ms
-   ✓ Vitest for ECDSA Key Generation > ECDSA Key Generation - Should execute full pipeline successfully 11ms
+Mobile Cryptographic Core Engine - Validation Vectors
+    SHA-256 Tests
+      ✓ Verifies industry standard vector "abc" (1 ms)
+      ✓ Verifies empty string hash vector
+    ECDSA P-256 Pipeline
+      ✓ Executes end-to-end keygen, signature generation, and verification (41 ms)
 
- Test Files  1 passed (1)
-      Tests  3 passed (3)
-   Start at  10:43:30
-   Duration  402ms
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        0.516 s, estimated 1 s

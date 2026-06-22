@@ -102,8 +102,8 @@ export default function KeyPair() {
         placeholder="Type message to sign..."
         value={message}
         onChangeText={setMessage}
+        autoComplete="none"
         autoCapitalize="none"
-        autoComplete = "none"
       />
       <Button title="Sign" onPress={signMessageMethod} />
 
