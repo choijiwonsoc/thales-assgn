@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { p256 } from "@noble/curves/nist";
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, Button, Alert } from "react-native";
 import { bytesToHex, hexToBytes } from "@noble/curves/utils";
 import { styles } from "./common";
 import { generateKeyPair, signMessage, verifySignature } from "./cryptoUtils";
+import * as Clipboard from 'expo-clipboard'; 
 
 export default function KeyPair() {
   const [keyPair, setKeyPair] = useState(null);
@@ -13,10 +14,15 @@ export default function KeyPair() {
   const [isValid, setIsValid] = useState(null);
   const [signatureHex, setSignatureHex] = useState("");
 
-  const copyToClipboard = async (textToCopy) => {
-    await Clipboard.setStringAsync(textToCopy);
-    alert('Copied to clipboard!');
-  };
+  const copyToClipboard = (textToCopy) => {
+  Clipboard.setStringAsync(textToCopy)
+    .then(() => {
+      Alert.alert("Success", "Copied to clipboard!");
+    })
+    .catch((err) => {
+      Alert.alert("Error", `Failed to copy: ${err}`);
+    });
+};
 
 
   const generateKeyPairMethod = async () => {
@@ -33,6 +39,7 @@ export default function KeyPair() {
 
   const signMessageMethod = async () => {
     if (!keyPair || !message) {
+      Alert.alert("Error", "Please enter a message")
       return;
     }
     try {
@@ -46,6 +53,7 @@ export default function KeyPair() {
 
   const verifySignatureMethod = async () => {
     if (!publicKey || !message || !signatureHex) {
+      Alert.alert("Error", "Please enter a message")
       return;
     }
     try {
@@ -94,6 +102,8 @@ export default function KeyPair() {
         placeholder="Type message to sign..."
         value={message}
         onChangeText={setMessage}
+        autoCapitalize="none"
+        autoComplete = "none"
       />
       <Button title="Sign" onPress={signMessageMethod} />
 
