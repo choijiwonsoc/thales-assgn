@@ -24,12 +24,12 @@ export default function KeyPair() {
         }
     }
 
-    const handleImportKeys = async()=>{
+    const handleImportKeys = async () => {
         if (!publicKey || !privateKey) {
             alert("Please paste both keys first!");
             return;
         }
-        try{
+        try {
             const pubKeyObj = await importPublicKey(publicKey);
             const privKeyObj = await importPrivateKey(privateKey);
             setKeyPair({
@@ -37,7 +37,7 @@ export default function KeyPair() {
                 privateKey: privKeyObj
             })
             setIsValid(null);
-        }catch (err) {
+        } catch (err) {
             alert(`Error importing key pair: ${err}`)
             console.log("Error importing key pair: ", err);
         }
@@ -47,7 +47,7 @@ export default function KeyPair() {
         if (!keyPair || !message) { return; }
         try {
             const results = await signMessage(message, keyPair);
-            
+
             setSignatureHex(results);
         } catch (err) {
             alert(`Error while signing: ${err}`)
@@ -88,10 +88,12 @@ export default function KeyPair() {
         color: '#666',
         marginBottom: '4px'
     };
+    const [showKey, setShowKey] = useState(false);
+    const maskedValue = privateKey ? '•'.repeat(privateKey.length) : ''
 
     return (
         <div style={{
-            width:"400px",
+            width: "400px",
             margin: '30px auto',
             padding: '20px',
             fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -103,11 +105,11 @@ export default function KeyPair() {
             {/* Key Generation Section */}
             <section style={{ marginBottom: '25px', paddingBottom: '20px', borderBottom: '1px solid #eee' }}>
                 <h3 style={{ marginTop: 0, marginBottom: '12px', fontSize: '18px' }}>ECDSA Key Generation</h3>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '15px', backgroundColor: '#f0f0f0', padding: '4px', borderRadius: '6px', justifyContent:'center' }}>
-                    <button onClick={()=>{ setMode('generate'); setKeyPair(null); setPublicKey(''); setPrivateKey(''); }}>Generate</button>
-                    <button onClick={()=>{ setMode('import'); setKeyPair(null); setPublicKey(''); setPrivateKey(''); }}>Import Keys</button>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '15px', backgroundColor: '#f0f0f0', padding: '4px', borderRadius: '6px', justifyContent: 'center' }}>
+                    <button onClick={() => { setMode('generate'); setKeyPair(null); setPublicKey(''); setPrivateKey(''); }}>Generate</button>
+                    <button onClick={() => { setMode('import'); setKeyPair(null); setPublicKey(''); setPrivateKey(''); }}>Import Keys</button>
                 </div>
-                
+
 
                 {mode == "generate" ? (
                     <div style={{ marginTop: '12px' }}>
@@ -116,28 +118,54 @@ export default function KeyPair() {
                         <textarea readOnly value={publicKey} rows={4} />
 
                         <label style={labelStyle}>Private Key</label>
-                        <textarea readOnly value={privateKey} rows={4} />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <button
+                                type="button"
+                                onClick={() => setShowKey(!showKey)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#007bff',
+                                    fontSize: '14px',
+                                    padding: '0 4px'
+                                }}
+                            >
+                                {showKey ? 'Hide' : 'Reveal'}
+                            </button>
+                            <textarea
+                                readOnly
+                                value={showKey ? privateKey : maskedValue}
+                                rows={4}
+                                style={{
+                                    fontFamily: 'monospace', // Keeps spacing consistent
+                                    letterSpacing: showKey ? 'normal' : '3px', // Spreads dots for readability
+                                    resize: 'none'
+                                }}
+
+                            />
+                        </div>
                     </div>
-                ):(
+                ) : (
                     <div>
                         <label style={labelStyle}>Paste Public Key (Hex)</label>
-                        <textarea 
-                            value={publicKey} 
+                        <textarea
+                            value={publicKey}
                             placeholder="Paste spki public key hex here..."
-                            onChange={(e) => setPublicKey(e.target.value)} 
-                            rows={4} 
-                
+                            onChange={(e) => setPublicKey(e.target.value)}
+                            rows={4}
+
                         />
 
                         <label style={labelStyle}>Paste Private Key (Hex)</label>
-                        <textarea 
-                            value={privateKey} 
+                        <textarea
+                            value={privateKey}
                             placeholder="Paste pkcs8 private key hex here..."
-                            onChange={(e) => setPrivateKey(e.target.value)} 
-                            rows={4} 
-           
+                            onChange={(e) => setPrivateKey(e.target.value)}
+                            rows={4}
+
                         />
-                        
+
                         <button onClick={handleImportKeys} style={{ ...buttonStyle, backgroundColor: '#28a745', marginTop: '15px' }}>
                             Load & Verify Pasted Keys
                         </button>
@@ -162,7 +190,7 @@ export default function KeyPair() {
                         fontSize: '14px'
                     }}
                 />
-                <button onClick={()=>signMessageMethod(message, keyPair)} disabled={!message} style={buttonStyle}>Sign</button>
+                <button onClick={() => signMessageMethod(message, keyPair)} disabled={!message} style={buttonStyle}>Sign</button>
 
                 {signatureHex && (
                     <div style={{ marginTop: '12px' }}>
@@ -174,7 +202,7 @@ export default function KeyPair() {
 
             <section>
                 <h3 style={{ marginTop: 0, marginBottom: '12px', fontSize: '18px' }}>Verify Signature</h3>
-                <button onClick={()=>verifySignatureMethod(keyPair, message, signatureHex)} disabled={!signatureHex} style={buttonStyle}>Verify</button>
+                <button onClick={() => verifySignatureMethod(keyPair, message, signatureHex)} disabled={!signatureHex} style={buttonStyle}>Verify</button>
 
                 {isValid !== null && (
                     <div style={{

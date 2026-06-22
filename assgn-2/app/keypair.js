@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { p256 } from "@noble/curves/nist";
-import { View, Text, TextInput, Button, Alert } from "react-native";
-import { bytesToHex, hexToBytes } from "@noble/curves/utils";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import { styles } from "./common";
 import { generateKeyPair, signMessage, verifySignature } from "./cryptoUtils";
-import * as Clipboard from 'expo-clipboard'; 
+import * as Clipboard from "expo-clipboard";
 
 export default function KeyPair() {
   const [keyPair, setKeyPair] = useState(null);
@@ -15,15 +21,14 @@ export default function KeyPair() {
   const [signatureHex, setSignatureHex] = useState("");
 
   const copyToClipboard = (textToCopy) => {
-  Clipboard.setStringAsync(textToCopy)
-    .then(() => {
-      Alert.alert("Success", "Copied to clipboard!");
-    })
-    .catch((err) => {
-      Alert.alert("Error", `Failed to copy: ${err}`);
-    });
-};
-
+    Clipboard.setStringAsync(textToCopy)
+      .then(() => {
+        Alert.alert("Success", "Copied to clipboard!");
+      })
+      .catch((err) => {
+        Alert.alert("Error", `Failed to copy: ${err}`);
+      });
+  };
 
   const generateKeyPairMethod = async () => {
     try {
@@ -32,28 +37,28 @@ export default function KeyPair() {
       setPublicKey(results.pubHex);
       setKeyPair(results.rawPair);
     } catch (err) {
-      Alert.alert("Error generating key pair", `${err}`)
+      Alert.alert("Error generating key pair", `${err}`);
       console.log("Error generating key pair: ", err);
     }
   };
 
   const signMessageMethod = async () => {
     if (!keyPair || !message) {
-      Alert.alert("Error", "Please enter a message")
+      Alert.alert("Error", "Please enter a message");
       return;
     }
     try {
       const results = await signMessage(message, keyPair);
       setSignatureHex(results);
     } catch (err) {
-      Alert.alert("Error while signing", `${err}`)
+      Alert.alert("Error while signing", `${err}`);
       console.error("Error while signing: ", err);
     }
   };
 
   const verifySignatureMethod = async () => {
     if (!publicKey || !message || !signatureHex) {
-      Alert.alert("Error", "Please enter a message")
+      Alert.alert("Error", "Please enter a message");
       return;
     }
     try {
@@ -62,10 +67,12 @@ export default function KeyPair() {
       console.log(result);
     } catch (err) {
       setIsValid(false);
-      Alert.alert("Error while verifying", `${err}`)
+      Alert.alert("Error while verifying", `${err}`);
       console.log("Error while verifying: ", err);
     }
   };
+  const [showKey, setShowKey] = useState(false);
+  const maskedValue = privateKey ? "•".repeat(privateKey.length) : "";
 
   return (
     <View style={{ width: "80%", paddingVertical: 20 }}>
@@ -78,14 +85,36 @@ export default function KeyPair() {
         <View>
           <View style={styles.card}>
             <Text style={{ fontSize: 14 }}>Pub: {publicKey}</Text>
-           <Button title="Copy Text" onPress={()=>copyToClipboard(publicKey)} />
+            <Button
+              title="Copy Text"
+              onPress={() => copyToClipboard(publicKey)}
+            />
           </View>
-          
+
           <View style={styles.card}>
-            <Text style={{ fontSize: 14 }}>Priv: {privateKey}</Text>
-          <Button title="Copy Text" onPress={()=>copyToClipboard(privateKey)} />
+            <Text>Priv: </Text>
+            <TouchableOpacity
+              onPress={() => setShowKey(!showKey)}
+              style={{
+                paddingVertical: 4,
+                paddingHorizontal: 8,
+                alignSelf: "flex-start",
+                backgroundColor: "lightblue", 
+                borderRadius: 4, 
+              }}
+            >
+              <Text style={styles.toggleButtonText}>
+                {showKey ? "Hide" : "Reveal"}
+              </Text>
+            </TouchableOpacity>
+            <Text style={[styles.keyText, !showKey && { letterSpacing: 2 }]}>
+              {showKey ? privateKey : maskedValue}
+            </Text>
+            <Button
+              title="Copy Text"
+              onPress={() => copyToClipboard(privateKey)}
+            />
           </View>
-          
         </View>
       ) : null}
 
